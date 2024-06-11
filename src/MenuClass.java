@@ -67,10 +67,10 @@ public class MenuClass {
     private void showMenuOptions() {
         System.out.println("********************************************************");
         System.out.println("1. Create Product");
-        System.out.println("2. Modify Product");
+        System.out.println("2. Modify Product Price");
         System.out.println("3. Delete Product");
         System.out.println("4. List All Products");
-        System.out.println("5. List Sold Products");
+        System.out.println("5. List Total Products Sold");
         System.out.println("6. List of Most Popular Products");
         System.out.println("7. List of Least Popular Products");
         System.out.println("8. List Users Who Have Not Purchased Recently");
@@ -113,13 +113,13 @@ public class MenuClass {
     private void updateProduct(Connection connection) {
         // Gather product details from user input
         System.out.println("Enter product details to update:");
-        System.out.print("Product Name: ");
-        String productName = reader.nextLine();
+        System.out.print("Enter SKU of the product to modify: ");
+        int sku = reader.nextInt();
         System.out.print("New Price: ");
         double newPrice = reader.nextDouble();
 
         // Call the updateProduct method from ProductControl class
-        ProductControl.updateProduct(connection, productName, newPrice);
+        ProductControl.updateProduct(connection, sku, newPrice);
     }
 
     private void deleteProduct(Connection connection) {

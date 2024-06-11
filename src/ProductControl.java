@@ -56,16 +56,15 @@ public class ProductControl {
         }
     }
 
-    public static void updateProduct(Connection connection, String productName, Double newAmount) {
+    public static void updateProduct(Connection connection, int sku, Double newAmount) {
         try {
-            String selectSql = "SELECT SKU FROM PRODUCT WHERE ProductName = ?";
+            String selectSql = "SELECT SKU FROM PRODUCT WHERE SKU = ?";
             PreparedStatement selectStatement = connection.prepareStatement(selectSql);
-            selectStatement.setString(1, productName);
+            selectStatement.setInt(1, sku);
 
             ResultSet resultSet = selectStatement.executeQuery();
 
             if (resultSet.next()) {
-                int sku = resultSet.getInt("SKU");
 
                 String updateSql = "UPDATE PRODUCT SET Price = ? WHERE SKU = ?";
                 PreparedStatement updateStatement = connection.prepareStatement(updateSql);
@@ -77,11 +76,12 @@ public class ProductControl {
 
                 if (rowsUpdated > 0) {
                     System.out.println("The product price was updated successfully!");
+                } else {
+                    System.out.println("Failed to update the product price.");
                 }
-
                 updateStatement.close();
             } else {
-                System.out.println("Product not found.");
+               System.out.println("Product not Found.");
             }
 
             resultSet.close();
@@ -241,7 +241,6 @@ public class ProductControl {
             // Close the result set, statement, and connection
             resultSet.close();
             preparedStatement.close();
-            connection.close();
 
         } catch (SQLException e) {
             e.printStackTrace();
