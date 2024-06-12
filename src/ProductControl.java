@@ -102,29 +102,51 @@ public class ProductControl {
 
     public static void deleteProduct(Connection connection, int sku) {
         try {
-            if (connection.isClosed()) {
-                System.out.println("Connection is closed. Cannot perform delete operation.");
-                return; // Exit method if connection is closed
-            }
+            // Disable auto-commit to handle transactions
+            connection.setAutoCommit(false);
+
+            // Delete inventory records associated with the product
+            deleteInventory(connection, sku);
+
+            // Delete the product
             String sql = "DELETE FROM PRODUCT WHERE SKU = ?";
-            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+                preparedStatement.setInt(1, sku);
 
-            preparedStatement.setInt(1,sku);
+                int rowsDeleted = preparedStatement.executeUpdate();
 
-            int rowsDeleted = preparedStatement.executeUpdate();
+                if (rowsDeleted > 0) {
+                    System.out.println("The product was deleted from the inventory successfully!");
+                } else {
+                    System.out.println("No product found with the given SKU.");
+                }
 
-            if (rowsDeleted > 0) {
-                System.out.println("The product was deleted from the inventory successfully!");
-            } else {
-                System.out.println("No product found with the given SKU.");
+                // Commit the transaction
+                connection.commit();
             }
-            preparedStatement.close();
-
         } catch (SQLException e) {
+            try {
+                // Rollback the transaction in case of any exception
+                connection.rollback();
+            } catch (SQLException rollbackException) {
+                rollbackException.printStackTrace();
+            }
             e.printStackTrace();
         }
     }
+    // Method to delete inventory records associated with a product
+    public static void deleteInventory(Connection connection, int sku) throws SQLException {
+        String sql = "DELETE FROM INVENTORY WHERE SKU = ?";
 
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, sku);
+            statement.executeUpdate();
+            System.out.println("Inventory records deleted successfully for product SKU: " + sku);
+        } catch (SQLException e) {
+            System.err.println("Error deleting inventory records: " + e.getMessage());
+            throw e; //
+        }
+    }
     public static void leastPopularProducts(Connection connection, String startDate, String endDate) {
         try {
             // Define the SQL query to get the least popular products in a given time range
@@ -145,7 +167,7 @@ public class ProductControl {
             ResultSet resultSet = preparedStatement.executeQuery();
 
             // Process the result set
-            System.out.println("Least Popular Products:");
+            System.out.println("** Least Popular Products **");
             while (resultSet.next()) {
                 String productName = resultSet.getString("ProductName");
                 int orderCount = resultSet.getInt("OrderCount");
@@ -179,6 +201,7 @@ public class ProductControl {
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             ResultSet resultSet = preparedStatement.executeQuery();
 
+            System.out.println("** Most Popular Products **");
             while (resultSet.next()) {
                 String productName = resultSet.getString("ProductName");
                 int totalSold = resultSet.getInt("TotalSold");
@@ -240,7 +263,7 @@ public class ProductControl {
             ResultSet resultSet = preparedStatement.executeQuery();
 
             // Process the result set
-            System.out.println("Inactive Users and Products They Normally Purchase:");
+            System.out.println("** Inactive Users and Products They Normally Purchase **");
             while (resultSet.next()) {
                 int userId = resultSet.getInt("UserID");
                 String fullName = resultSet.getString("FullName");

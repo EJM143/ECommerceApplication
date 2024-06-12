@@ -111,7 +111,7 @@ public class MenuClass {
 
     private void updateProduct(Connection connection) {
         // Gather product details from user input
-        System.out.println("Enter product details to update:");
+        System.out.println("** Enter product details to update **");
         System.out.print("Please enter the SKU of the product to update: ");
         int sku = reader.nextInt();
         System.out.print("New Price: ");
@@ -124,7 +124,7 @@ public class MenuClass {
 
     private void deleteProduct(Connection connection) {
         // Gather product details from user input
-        System.out.println("Enter product details to delete:");
+        System.out.println("** Enter product details to delete **");
         System.out.print("Enter the SKU of the product to delete: ");
         int sku = reader.nextInt();
         reader.nextLine();
