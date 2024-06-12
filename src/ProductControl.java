@@ -58,6 +58,13 @@ public class ProductControl {
 
     public static void updateProduct(Connection connection, int sku, Double newAmount) {
         try {
+            // Check if connection is closed
+            if (connection.isClosed()) {
+                System.out.println("Connection is closed. Cannot perform update operation.");
+                return; // Exit method if connection is closed
+            }
+
+            // Prepare SQL statement to retrieve the SKU
             String selectSql = "SELECT SKU FROM PRODUCT WHERE SKU = ?";
             PreparedStatement selectStatement = connection.prepareStatement(selectSql);
             selectStatement.setInt(1, sku);
@@ -65,7 +72,7 @@ public class ProductControl {
             ResultSet resultSet = selectStatement.executeQuery();
 
             if (resultSet.next()) {
-
+                // SKU found, proceed with update
                 String updateSql = "UPDATE PRODUCT SET Price = ? WHERE SKU = ?";
                 PreparedStatement updateStatement = connection.prepareStatement(updateSql);
 
@@ -77,41 +84,46 @@ public class ProductControl {
                 if (rowsUpdated > 0) {
                     System.out.println("The product price was updated successfully!");
                 } else {
-                    System.out.println("Failed to update the product price.");
+                    System.out.println("Failed to update product price. No matching SKU found.");
                 }
+
                 updateStatement.close();
             } else {
-               System.out.println("Product not Found.");
+                // SKU not found
+                System.out.println("Product with SKU " + sku + " not found.");
             }
 
             resultSet.close();
             selectStatement.close();
-
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
     public static void deleteProduct(Connection connection, int sku) {
-            try {
-                String sql = "DELETE FROM PRODUCT WHERE SKU = ?";
-                PreparedStatement preparedStatement = connection.prepareStatement(sql);
-
-                preparedStatement.setInt(1,sku);
-
-                int rowsDeleted = preparedStatement.executeUpdate();
-
-                if (rowsDeleted > 0) {
-                    System.out.println("The product was deleted from the inventory successfully!");
-                } else {
-                    System.out.println("No product found with the given SKU.");
-                }
-                preparedStatement.close();
-
-            } catch (SQLException e) {
-                e.printStackTrace();
+        try {
+            if (connection.isClosed()) {
+                System.out.println("Connection is closed. Cannot perform delete operation.");
+                return; // Exit method if connection is closed
             }
+            String sql = "DELETE FROM PRODUCT WHERE SKU = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+
+            preparedStatement.setInt(1,sku);
+
+            int rowsDeleted = preparedStatement.executeUpdate();
+
+            if (rowsDeleted > 0) {
+                System.out.println("The product was deleted from the inventory successfully!");
+            } else {
+                System.out.println("No product found with the given SKU.");
+            }
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
+    }
 
     public static void leastPopularProducts(Connection connection, String startDate, String endDate) {
         try {
@@ -241,6 +253,7 @@ public class ProductControl {
             // Close the result set, statement, and connection
             resultSet.close();
             preparedStatement.close();
+            connection.close();
 
         } catch (SQLException e) {
             e.printStackTrace();
