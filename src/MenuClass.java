@@ -60,7 +60,8 @@ public class MenuClass {
     public void start() {
         System.out.println();
         System.out.println("********************************************************");
-        System.out.println("Welcome to SSS Pet Supplies Product Management System!");
+        System.out.println("Welcome to Seattle Spoiled & Sassy Pet Supplies");
+        System.out.println("          Product Management System!           ");
         mainMenu();
     }
     private void showMenuOptions() {
@@ -75,7 +76,6 @@ public class MenuClass {
         System.out.println("8. List Users Who Have Not Purchased Recently");
         System.out.println("9. Exit");
         System.out.println("********************************************************");
-        System.out.println();
 
     }
 

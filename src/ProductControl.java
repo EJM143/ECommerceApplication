@@ -116,7 +116,7 @@ public class ProductControl {
                 int rowsDeleted = preparedStatement.executeUpdate();
 
                 if (rowsDeleted > 0) {
-                    System.out.println("The product was deleted from the inventory successfully!");
+                    System.out.println("The product was deleted from the inventory and product table successfully!");
                 } else {
                     System.out.println("No product found with the given SKU.");
                 }
